@@ -40,10 +40,10 @@ namespace lilac::meta {
         };
 
         template<class... Stack>
-        static constexpr size_t stack_fix = (
-        ((sizeof(Stack) % sizeof(void*) == 0) ?
-            sizeof(Stack) :
-            sizeof(Stack) - (sizeof(Stack) % sizeof(void*)) + sizeof(void*)) + ...);
+        static constexpr size_t stack_fix = 
+            (((sizeof(Stack) % sizeof(void*) == 0) ?
+                sizeof(Stack) :
+                sizeof(Stack) - (sizeof(Stack) % sizeof(void*)) + sizeof(void*)) + ...);
 
         template<>
         static constexpr size_t stack_fix<> = 0;
@@ -89,8 +89,8 @@ namespace lilac::meta {
                 check(1, sse_passable, 1907.0f),
                 check(2, sse_passable, 1907.0f),
                 check(3, sse_passable, 1907.0f),
-                0.0f,
-                0.0f,
+                1907.0f,
+                1907.0f,
                 check(0, gpr_passable, 1907),
                 check(1, gpr_passable, 1907),
                 all.template at<indices>()...
