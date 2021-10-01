@@ -1,11 +1,11 @@
-#ifndef _LILAC_META_WINDOWS_X86_OPTCALL_HPP_
-#define _LILAC_META_WINDOWS_X86_OPTCALL_HPP_
+#ifndef _LILAC_META_X86_MEMBERCALL_HPP_
+#define _LILAC_META_X86_MEMBERCALL_HPP_
 
 #include "function.hpp"
 
-namespace lilac::meta::WindowsX86 {
+namespace lilac::meta::x86 {
     template<class Ret, class... Args>
-    class Optcall : public CallConv<Args...> {
+    class Membercall : public CallConv<Args...> {
     private:
         using MyConv = CallConv<Args...>;
         using MyTuple = Tuple<Args...>;
@@ -31,7 +31,7 @@ namespace lilac::meta::WindowsX86 {
                     float, double
                 >;
         };
-        
+
         template<class... Stack>
         static constexpr size_t stack_fix = 
             (((sizeof(Stack) % sizeof(void*) == 0) ?
@@ -45,37 +45,38 @@ namespace lilac::meta::WindowsX86 {
         template<size_t i, class Current>
         struct filter {
             static constexpr bool value = 
-                (!gpr_passable<Current>::value &&
-                !sse_passable<Current>::value) || i > 3;
+                (!gpr_passable<Current>::value || i > 0) &&
+                (!sse_passable<Current>::value || i > 3);
         };
-        
+
         template<size_t... indices>
         static decltype(auto) invoke(
-            const unsigned int addr,
+            Ret(*addr)(Args...),
             const Tuple<Args...>&& all,
             const std::index_sequence<indices...>&&
         ) {
             Ret(__vectorcall* raw)(
-                typename MyConv::template type_if<0, sse_passable, float>,
+                float,
                 typename MyConv::template type_if<1, sse_passable, float>,
                 typename MyConv::template type_if<2, sse_passable, float>,
                 typename MyConv::template type_if<3, sse_passable, float>,
-                float, float,
-                typename MyConv::template type_if<0, gpr_passable, int>,
-                typename MyConv::template type_if<1, gpr_passable, int>,
+                float,
+                float,
+                typename MyTuple::template type_at<0>,
+                int,
                 typename MyTuple::template type_at<indices>...
             ) = reinterpret_cast<decltype(raw)>(addr);
 
             if constexpr (!std::is_same_v<Ret, void>) {
                 Ret ret = raw(
-                    MyConv::template value_if<0, sse_passable>(all, 1907.0f),
+                    1907.0f,
                     MyConv::template value_if<1, sse_passable>(all, 1907.0f),
                     MyConv::template value_if<2, sse_passable>(all, 1907.0f),
                     MyConv::template value_if<3, sse_passable>(all, 1907.0f),
                     1907.0f,
                     1907.0f,
-                    MyConv::template value_if<0, gpr_passable>(all, 1907),
-                    MyConv::template value_if<1, gpr_passable>(all, 1907),
+                    all.template at<0>(),
+                    1907,
                     all.template at<indices>()...
                 );
 
@@ -88,14 +89,14 @@ namespace lilac::meta::WindowsX86 {
             }
             else {
                 raw(
-                    MyConv::template value_if<0, sse_passable>(all, 1907.0f),
+                    1907.0f,
                     MyConv::template value_if<1, sse_passable>(all, 1907.0f),
                     MyConv::template value_if<2, sse_passable>(all, 1907.0f),
                     MyConv::template value_if<3, sse_passable>(all, 1907.0f),
                     1907.0f,
                     1907.0f,
-                    MyConv::template value_if<0, gpr_passable>(all, 1907),
-                    MyConv::template value_if<1, gpr_passable>(all, 1907),
+                    all.template at<0>(),
+                    1907,
                     all.template at<indices>()...
                 );
 
@@ -108,4 +109,4 @@ namespace lilac::meta::WindowsX86 {
     };
 }
 
-#endif /* _LILAC_META_WINDOWS_X86_OPTCALL_HPP_ */
+#endif /* _LILAC_META_X86_MEMBERCALL_HPP_ */

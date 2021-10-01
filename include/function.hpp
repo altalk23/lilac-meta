@@ -64,11 +64,12 @@ namespace lilac::meta {
         using MyTuple = Tuple<Args...>;
 
     private:
-        const unsigned int addr;
+        Ret(*addr)(Args...);
 
     public:
-        Function(const unsigned int addr)
-            : addr(addr) {}
+        template<class T>
+        Function(const T& addr)
+            : addr(reinterpret_cast<Ret(*)(Args...)>(addr)) {}
 
         decltype(auto) operator()(Args... all) const {
             return MyConv::invoke(
