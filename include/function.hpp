@@ -5,7 +5,6 @@
 #include "common.hpp"
 
 #include <type_traits>
-#include <xstddef>
 
 namespace lilac::meta {
     template<typename F>

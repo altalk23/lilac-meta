@@ -26,7 +26,6 @@ namespace lilac::meta {
 
     template<class Class, class... Compare>
     static constexpr bool any_of = std::disjunction_v<std::is_same<Class, Compare>...>;
-
 }
 
 #endif /* __LILAC_META_COMMON_HPP__ */
