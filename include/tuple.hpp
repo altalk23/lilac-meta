@@ -1,5 +1,7 @@
-#ifndef __LILAC_META_TUPLE_HPP__
-#define __LILAC_META_TUPLE_HPP__
+#ifndef _LILAC_META_TUPLE_HPP_
+#define _LILAC_META_TUPLE_HPP_
+
+#include "common.hpp"
 
 #include <type_traits>
 
@@ -22,6 +24,8 @@ namespace lilac::meta {
         };
 
     public:
+        static constexpr size_t size = 0;
+
         template<size_t>
         using type_at = void;
 
@@ -43,8 +47,8 @@ namespace lilac::meta {
         // Haskell
         template<template<size_t, class> class Pred, size_t i, size_t... seq>
         struct filter_impl {
-            using result = std::conditional_t<
-                    Pred<i, Current>::value, 
+            using result = typename ternary<Pred<i, Current>::value>
+                ::template type<
                     typename NextType::template filter_impl<Pred, i + 1, seq..., i>::result,
                     typename NextType::template filter_impl<Pred, i + 1, seq...>::result
                 >;
@@ -57,8 +61,8 @@ namespace lilac::meta {
         static constexpr size_t size = sizeof...(Rest) + 1;
 
         template<size_t i>
-        using type_at = std::conditional_t<
-                i == 0,
+        using type_at = typename ternary<i == 0>
+            ::template type<
                 Current,
                 typename NextType::template type_at<i - 1>
             >;
@@ -80,4 +84,4 @@ namespace lilac::meta {
     };
 }
 
-#endif /* __LILAC_META_TUPLE_HPP__ */
+#endif /* _LILAC_META_TUPLE_HPP_ */
