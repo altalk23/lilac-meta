@@ -9,6 +9,11 @@ namespace lilac::meta::x86 {
     private:
         using MyConv = CallConv<Args...>;
         using MyTuple = Tuple<Args...>;
+        
+        template<class Class>
+        struct ret_constructed {
+            static constexpr bool value = std::is_class_v<Class>; 
+        };
 
         template<class Class>
         struct gpr_passable {
@@ -31,6 +36,13 @@ namespace lilac::meta::x86 {
                     float, double
                 >;
         };
+
+        template <class Ret>
+        static constexpr size_t ret_fix = 
+            (ret_constructed<Ret>::value) ?
+                ((sizeof(Ret) % sizeof(void*) == 0) ? 
+                sizeof(Ret) : 
+                sizeof(Ret) - (sizeof(Ret) % sizeof(void*)) + sizeof(void*)) : 0;
         
         template<class... Stack>
         static constexpr size_t stack_fix = 
@@ -80,7 +92,7 @@ namespace lilac::meta::x86 {
                     all.template at<indices>()...
                 );
 
-                static constexpr size_t fix = stack_fix<typename MyTuple::template type_at<indices>...>;
+                static constexpr size_t fix = ret_fix<Ret> + stack_fix<typename MyTuple::template type_at<indices>...>;
                 if constexpr(fix != 0) {
                     __asm add esp, [fix]
                 }

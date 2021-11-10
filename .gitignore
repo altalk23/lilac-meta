@@ -1,2 +1,5 @@
 build/
 .cache/
+
+# macos :(
+**/.DS_Store
