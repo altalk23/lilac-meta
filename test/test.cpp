@@ -35,4 +35,6 @@ int main() {
 
     meta::Function<void(Test*, float, int), Membercall> { &test }(&t, 1.0f, 0x70);
     meta::Function<color(Test*, int, std::string, int), Membercall> { &test }(&t, 1.0f, "2", 0x70);
+
+    &meta::Wrapper<void(int, float, float, float), Optcall>(&myHook);
 }
