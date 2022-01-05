@@ -1,5 +1,5 @@
-#ifndef _LILAC_META_X86_MEMBERCALL_HPP_
-#define _LILAC_META_X86_MEMBERCALL_HPP_
+#ifndef _LILAC_META_X86_THISCALL_HPP_
+#define _LILAC_META_X86_THISCALL_HPP_
 
 #include "function.hpp"
 
